@@ -1,0 +1,21 @@
+common:
+  environment: ${ENVIRONMENT}
+  log_format: ${LOG_FORMAT}
+  sentry_dsn: ${SENTRY_DSN}
+
+http_addr: :8080
+
+db:
+  driver_name: ${DB_DRIVER_NAME}
+  data_source: ${DB_DATA_SOURCE}
+  max_open_conns: ${DB_MAX_OPEN_CONNS}
+  max_idle_conns: ${DB_MAX_IDLE_CONNS}
+  conn_max_life_time_ms: ${DB_CONN_MAX_LIFE_TIME_MS}
+  migration_conn_url: ${DB_MIGRATION_CONN_URL}
+  is_dev_mode: ${DB_IS_DEV_MODE}
+
+message_queue:
+  broker: ${MESSAGE_QUEUE_BROKER}
+  topic_request: ${MESSAGE_QUEUE_TOPIC_REQUEST}
+  topic_reply: ${MESSAGE_QUEUE_TOPIC_REPLY}
+  group_id: ${MESSAGE_QUEUE_GROUP_ID}
