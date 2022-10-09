@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/vumanhcuongit/scan/internal/services/api"
+	pkgerrors "github.com/vumanhcuongit/scan/pkg/errors"
 )
 
 type Handler struct {
@@ -20,19 +20,24 @@ func NewHandler(scanService *api.ScanService) *Handler {
 
 func (h *Handler) Register(router gin.IRouter) {
 	apiGroup := router.Group("api")
-	apiGroup.POST("/scans/:repository_id", h.createScan)
+	apiGroup.POST("/repositories", h.createRepository)
+	apiGroup.POST("/scans", h.createScan)
 }
 
-func (h *Handler) createScan(ginCtx *gin.Context) {
-	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
-
-	log.Infof("starting to scan")
-	err := h.scanService.CreateScan(ctx, &api.CreateScanRequest{})
-	if err != nil {
-		_ = ginCtx.AbortWithError(http.StatusInternalServerError, err)
-		return
+func (h *Handler) ReturnData(ginCtx *gin.Context, data interface{}) {
+	resp := gin.H{}
+	if data != nil {
+		resp["data"] = data
 	}
 
-	ginCtx.JSON(http.StatusOK, map[string]string{"success": "true"})
+	ginCtx.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) ReturnError(ginCtx *gin.Context, err error) {
+	errInfo := pkgerrors.NewErrorInfo(err)
+
+	ginCtx.JSON(http.StatusOK, gin.H{
+		"data":  nil,
+		"error": errInfo,
+	})
 }

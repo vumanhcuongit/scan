@@ -73,6 +73,10 @@ func (r *Repo) WithTransaction(ctx context.Context, fn func(IRepo) error) (err e
 	return err
 }
 
-func (r *Repo) Registration() IRegistrationRepo {
-	return NewRegistrationSQLRepo(r.db)
+func (r *Repo) Repository() IRepositoryRepo {
+	return NewRepositorySQLRepo(r.db)
+}
+
+func (r *Repo) Scan() IScanRepo {
+	return NewScanSQLRepo(r.db)
 }

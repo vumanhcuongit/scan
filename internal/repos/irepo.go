@@ -13,6 +13,7 @@ type IRepo interface {
 	CleanDB()
 	WithTransaction(ctx context.Context, fn func(IRepo) error) (err error)
 	Repository() IRepositoryRepo
+	Scan() IScanRepo
 }
 
 type IRepositoryRepo interface {

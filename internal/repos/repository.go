@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/vumanhcuongit/scan/pkg/models"
 )
@@ -30,7 +31,9 @@ func (r *RepositorySQLRepo) GetByID(ctx context.Context, id int64) (*models.Repo
 }
 
 func (r *RepositorySQLRepo) Create(ctx context.Context, record *models.Repository) (*models.Repository, error) {
-	err := r.dbWithContext(ctx).Create(record).Error
+	err := r.dbWithContext(ctx).Clauses(clause.OnConflict{
+		DoUpdates: clause.AssignmentColumns([]string{"updated_at"}),
+	}).Create(record).Error
 	if err != nil {
 		return nil, err
 	}

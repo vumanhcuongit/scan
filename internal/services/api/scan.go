@@ -8,7 +8,9 @@ import (
 	"github.com/vumanhcuongit/scan/internal/services/worker"
 )
 
-type CreateScanRequest struct{}
+type CreateScanRequest struct {
+	RepositoryID string `json:"repository_id" binding:"required"`
+}
 
 func (s *ScanService) CreateScan(ctx context.Context, request *CreateScanRequest) error {
 	log := ctxzap.Extract(ctx).Sugar()
@@ -19,13 +21,13 @@ func (s *ScanService) CreateScan(ctx context.Context, request *CreateScanRequest
 		Repository: "workshop",
 	})
 	if err != nil {
-		log.Errorf("failed to marshal message, err: %+v", err)
+		log.Warnf("failed to marshal message, err: %+v", err)
 		return err
 	}
 
 	err = s.kafkaWriter.WriteMessage(ctx, message)
 	if err != nil {
-		log.Errorf("failed to write message to queue, err: %+v", err)
+		log.Warnf("failed to write message to queue, err: %+v", err)
 		return err
 	}
 

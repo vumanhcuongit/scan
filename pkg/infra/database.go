@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"fmt"
 	"time"
 
 	backoff "github.com/cenkalti/backoff/v4"
@@ -57,13 +56,8 @@ func (l GormLogger) Print(v ...interface{}) {
 func InitDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	db, err := gorm.Open(cfg.DriverName, cfg.DataSource)
 	if err != nil {
-		fmt.Println("---------------------")
-		fmt.Println(err)
 		return db, nil
 	}
-
-	fmt.Println("---------------------")
-	fmt.Println(cfg)
 
 	db.SetLogger(NewLogger(zap.S()))
 	db.LogMode(cfg.IsDevMode)
