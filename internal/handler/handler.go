@@ -20,7 +20,14 @@ func NewHandler(scanService *api.ScanService) *Handler {
 
 func (h *Handler) Register(router gin.IRouter) {
 	apiGroup := router.Group("api")
+	// repositories
 	apiGroup.POST("/repositories", h.createRepository)
+	apiGroup.GET("/repositories", h.listRepositories)
+	apiGroup.GET("/repositories/:id", h.getRepository)
+	apiGroup.PATCH("/repositories/:id", h.updateRepository)
+	apiGroup.DELETE("/repositories/:id", h.deleteRepository)
+
+	// scans
 	apiGroup.POST("/scans", h.createScan)
 }
 
@@ -31,6 +38,10 @@ func (h *Handler) ReturnData(ginCtx *gin.Context, data interface{}) {
 	}
 
 	ginCtx.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) ReturnNoConent(ginCtx *gin.Context) {
+	ginCtx.Status(http.StatusNoContent)
 }
 
 func (h *Handler) ReturnError(ginCtx *gin.Context, err error) {

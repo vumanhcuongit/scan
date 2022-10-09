@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
@@ -29,11 +28,11 @@ func (w *Reader) Consume(ctx context.Context, fn ReaderFunc) error {
 		m, err := w.Reader.ReadMessage(ctx)
 		if err != nil {
 			log.Errorf("failed to consume message from Kafka, err: %+v", err)
-			return fmt.Errorf("failed to consume message, err: %+v", err)
+			return err
 		}
 		err = fn(ctx, m.Value)
 		if err != nil {
-			log.Infof("failed to process message: %+v", err)
+			log.Errorf("failed to process message: %+v", err)
 		}
 	}
 }
