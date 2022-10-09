@@ -11,29 +11,23 @@ services:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             timeout: 30s
             retries: 3
+    zookeeper:
+        hostname: zookeeper
+        image: wurstmeister/zookeeper:3.4.6
+        expose:
+            - "2181"
+        ports:
+            - "2181:2181"
     broker:
-        image: docker.redpanda.com/vectorized/redpanda:latest
-        ports:    
-        - "9092:19092"
-        - "8082:28082"
-        command:
-        - redpanda
-        - start
-        - --smp
-        - '1'
-        - --reserve-memory
-        - 0G
-        - --overprovisioned
-        - --node-id
-        - '0'
-        - --kafka-addr
-        - PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:19092
-        - --advertise-kafka-addr
-        - PLAINTEXT://broker:9092,OUTSIDE://127.0.0.1:9092
-        - --pandaproxy-addr
-        - PLAINTEXT://0.0.0.0:8082,OUTSIDE://0.0.0.0:28082
-        - --advertise-pandaproxy-addr
-        - PLAINTEXT://broker:8082,OUTSIDE://127.0.0.1:8082
+        image: wurstmeister/kafka
+        env_file:
+            - ./deployments/.kafka.env
+        depends_on:
+            - zookeeper
+        ports:
+            - '9092:9092'
+            - '8082:8082'
+            - '8083:8083'
     api:
         build: .
         container_name: api
@@ -43,12 +37,7 @@ services:
         ports:
             - "8000:8080"
         env_file:
-            - ./deployments/.dev.env
-        # environment:
-        #     DB_DATA_SOURCE: 'root:change_me@tcp(scan_db:3306)/scan?timeout=10s&parseTime=true'
-        #     DB_MIGRATION_CONN_URL: 'mysql://root:change_me@tcp(scan_db:3306)/scan'            
-        #     QUEUE_BROKERS: broker:9092
-        #     SERVER_ADDR: :8080
+            - ./deployments/.dev.env        
         restart: always
     worker:
         build: .
