@@ -12,23 +12,39 @@ type IRepo interface {
 	Stop()
 	CleanDB()
 	WithTransaction(ctx context.Context, fn func(IRepo) error) (err error)
-	Registration() IRegistrationRepo
+	Repository() IRepositoryRepo
 }
 
-type IRegistrationRepo interface {
-	Create(ctx context.Context, record *models.Registration) (*models.Registration, error)
-	GetByAppIdentifier(ctx context.Context, appIdentifier string) (*models.Registration, error)
-	GetByID(ctx context.Context, id int64) (*models.Registration, error)
+type IRepositoryRepo interface {
+	Create(ctx context.Context, record *models.Repository) (*models.Repository, error)
+	GetByID(ctx context.Context, id int64) (*models.Repository, error)
 	UpdateWithMap(
 		ctx context.Context,
-		record *models.Registration,
+		record *models.Repository,
 		params map[string]interface{},
 	) error
-	Delete(ctx context.Context, record *models.Registration) error
+	Delete(ctx context.Context, record *models.Repository) error
 	List(
 		ctx context.Context,
 		size int,
 		page int,
-		filter *models.RegistrationFilter,
-	) ([]*models.Registration, error)
+		filter *models.RepositoryFilter,
+	) ([]*models.Repository, error)
+}
+
+type IScanRepo interface {
+	Create(ctx context.Context, record *models.Scan) (*models.Scan, error)
+	GetByID(ctx context.Context, id int64) (*models.Scan, error)
+	UpdateWithMap(
+		ctx context.Context,
+		record *models.Scan,
+		params map[string]interface{},
+	) error
+	Delete(ctx context.Context, record *models.Scan) error
+	List(
+		ctx context.Context,
+		size int,
+		page int,
+		filter *models.ScanFilter,
+	) ([]*models.Scan, error)
 }
