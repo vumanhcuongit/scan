@@ -1,0 +1,204 @@
+openapi: 3.0.0
+info:
+  title: Scan
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/scans/1:
+    post:
+      tags:
+        - General
+      summary: Create Scan
+      requestBody:
+        content: {}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/repositories:
+    post:
+      tags:
+        - General
+      summary: Create Repository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 14:43:27 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '216'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 3
+                  name: bitflyer-rb
+                  owner: vumanhcuongit
+                  repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+                  created_at: '2022-10-09T21:43:27.804+07:00'
+                  updated_at: '2022-10-09T21:43:27.804+07:00'
+    get:
+      tags:
+        - General
+      summary: List Repositories
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '20'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 14:47:07 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '200'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 3
+                    name: bitflyer-rb
+                    owner: vumanhcuongit
+                    repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+                    created_at: '2022-10-09T14:43:28Z'
+                    updated_at: '2022-10-09T14:43:28Z'
+  /api/repositories/1:
+    patch:
+      tags:
+        - General
+      summary: Update Repository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                repository_url: https://github.com/vumanhcuongit/workshop1
+                owner: tinh
+                name: workshop1
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 14:46:46 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '194'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  name: workshop1
+                  owner: tinh
+                  repository_url: https://github.com/vumanhcuongit/workshop1
+                  created_at: '2022-10-09T14:34:07Z'
+                  updated_at: '2022-10-09T21:46:46.522+07:00'
+    delete:
+      tags:
+        - General
+      summary: Delete Repository
+      responses:
+        '204':
+          description: No Content
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 14:47:02 GMT
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: null
+  /api/repositories/3:
+    get:
+      tags:
+        - General
+      summary: Get Repository
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Mon, 10 Oct 2022 00:23:25 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '198'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 3
+                  name: bitflyer-rb
+                  owner: vumanhcuongit
+                  repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+                  created_at: '2022-10-09T14:43:28Z'
+                  updated_at: '2022-10-09T14:43:28Z'
+  /ping:
+    get:
+      tags:
+        - General
+      summary: Ping
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

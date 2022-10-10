@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/vumanhcuongit/scan/internal/services/api"
 	pkgerrors "github.com/vumanhcuongit/scan/pkg/errors"
 )
@@ -19,6 +20,12 @@ func NewHandler(scanService *api.ScanService) *Handler {
 }
 
 func (h *Handler) Register(router gin.IRouter) {
+	// documentation for developers
+	opts := middleware.SwaggerUIOpts{SpecURL: "./swagger.yaml"}
+	swagger := middleware.SwaggerUI(opts, nil)
+	router.StaticFile("/swagger.yaml", "api/swagger.yaml")
+	router.GET("/docs", gin.WrapH(swagger))
+
 	apiGroup := router.Group("api")
 	// repositories
 	apiGroup.POST("/repositories", h.createRepository)

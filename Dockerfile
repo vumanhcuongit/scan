@@ -38,6 +38,7 @@ COPY --from=builder /repo/worker /repo/worker
 COPY scripts /repo/scripts
 COPY configs /repo/configs
 COPY migrations /repo/migrations
+COPY api /repo/api
 
 RUN chmod +x /repo/scripts/run.sh
 
