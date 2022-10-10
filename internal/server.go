@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -44,6 +45,10 @@ func (s *Server) initPing() {
 			"time_now": time.Now().String(),
 		})
 	})
+}
+
+func (s *Server) Start() error {
+	return s.apiSvc.Start(context.Background())
 }
 
 // Listen listen on tcp port and serve http server.

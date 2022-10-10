@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/vumanhcuongit/scan/internal/services/worker"
 	"github.com/vumanhcuongit/scan/pkg/models"
 	"go.uber.org/zap"
 )
@@ -94,7 +93,7 @@ func (s *ScanService) createScan(ctx context.Context, repository *models.Reposit
 func (s *ScanService) produceTriggerScanMessage(ctx context.Context, scan *models.Scan, repository *models.Repository) error {
 	log := zap.S()
 
-	message, err := json.Marshal(worker.ScanRequest{
+	message, err := json.Marshal(models.ScanRequestMessage{
 		ScanID:     scan.ID,
 		Owner:      repository.Owner,
 		Repository: repository.Name,

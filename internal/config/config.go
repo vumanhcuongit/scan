@@ -12,7 +12,7 @@ type App struct {
 	EnvConfig    *EnvConfig         `yaml:"common"`
 	DB           *DatabaseConfig    `yaml:"db"`
 	MessageQueue MessageQueueConfig `yaml:"message_queue"`
-	GRPCPort     string             `yaml:"grpc_port"`
+	RedisWorker  RedisWorkerConfig  `yaml:"redis_worker"`
 	HTTPAddr     string             `yaml:"http_addr"`
 }
 
@@ -39,21 +39,9 @@ type DatabaseConfig struct {
 	IsDevMode                  bool   `yaml:"is_dev_mode"`
 }
 
-type WebhookConfig struct {
-	TimeOutInSeconds int `yaml:"timeout_in_seconds"`
-}
-
-type TNSLServiceConfig struct {
-	BaseURL                    string `yaml:"base_url"`
-	TimeOutInSeconds           int    `yaml:"timeout_in_seconds"`
-	AccessToken                string `yaml:"access_token"`
-	WebhookSecretToken         string `yaml:"webhook_secret_token"`
-	SwitchingStatusAccessToken string `yaml:"switching_status_access_token"`
-}
-
-type ServiceDiscovery struct {
-	CredentialDSN string `yaml:"credential_dsn"`
-	OrderDSN      string `yaml:"order_dsn"`
+type RedisWorkerConfig struct {
+	RedisURL                string `yaml:"redis_url"`
+	TotalConcurrencyWorkers uint   `yaml:"total_concurrency_workers"`
 }
 
 // Load load config from file and environment variables.

@@ -5,6 +5,8 @@ common:
 
 http_addr: :8080
 
+source_codes_dir: ${SOURCE_CODES_DIR}
+
 db:
   driver_name: ${DB_DRIVER_NAME}
   data_source: ${DB_DATA_SOURCE}
@@ -17,5 +19,9 @@ db:
 message_queue:
   broker: ${MESSAGE_QUEUE_BROKER}
   topic_request: ${MESSAGE_QUEUE_TOPIC_REQUEST}
-  topic_reply: ${MESSAGE_QUEUE_TOPIC_REPLY}
+  topic_reply: ${MESSAGE_QUEUE_TOPIC_RESULT}
   group_id: ${MESSAGE_QUEUE_GROUP_ID}
+
+redis_worker:
+  redis_url: ${REDIS_URL}
+  total_concurrency_workers: ${TOTAL_CONCURRENCY_WORKERS}

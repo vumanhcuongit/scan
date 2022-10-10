@@ -11,6 +11,12 @@ services:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             timeout: 30s
             retries: 3
+    redis:
+        container_name: redis_worker
+        image: redis:7.0-alpine
+        restart: always
+        ports:
+            - '6379:6379'        
     zookeeper:
         hostname: zookeeper
         image: wurstmeister/zookeeper:3.4.6
@@ -28,9 +34,9 @@ services:
             - '9092:9092'
             - '8082:8082'
             - '8083:8083'
-    api:
+    scanning:
         build: .
-        container_name: api
+        container_name: scanning
         depends_on:
             - database
             - broker
@@ -39,12 +45,14 @@ services:
         env_file:
             - ./deployments/.dev.env        
         restart: always
-    worker:
+    execution:
         build: .
-        container_name: worker
-        command: ["/repo/scripts/run.sh", "worker"]        
+        container_name: execution
+        command: ["/repo/scripts/run.sh", "execution"]        
         depends_on:
             - broker
+            - redis
         env_file:
             - ./deployments/.dev.env        
         restart: always
+        

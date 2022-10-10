@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/vumanhcuongit/scan/internal/config"
-	"github.com/vumanhcuongit/scan/internal/services/worker"
+	"github.com/vumanhcuongit/scan/internal/services/execution"
 	"github.com/vumanhcuongit/scan/pkg/infra"
 	"github.com/vumanhcuongit/scan/pkg/kafka"
 	"go.uber.org/zap"
@@ -40,8 +40,8 @@ func main() {
 
 	zap.S().Info(cfg.MessageQueue)
 	kafkaReader := kafka.NewReader(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicRequest, cfg.MessageQueue.GroupID)
-	w := worker.New(kafkaReader)
-	log.Printf("Starting worker")
-
-	log.Fatal(w.Run(context.Background()))
+	kafkaWriter := kafka.NewWriter(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicReply)
+	exec := execution.New(kafkaReader, kafkaWriter)
+	log.Printf("Starting execution service")
+	log.Fatal(exec.Run(context.Background()))
 }

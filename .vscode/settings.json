@@ -1,0 +1,23 @@
+{
+    "go.useLanguageServer": true,
+    "go.formatTool": "goimports",
+    "go.languageServerExperimentalFeatures": {
+      "autoComplete": false,
+      "diagnostics": true // for diagnostics as you type
+    },
+    "go.alternateTools": {
+      "go-langserver": "gopls"
+    },
+    "[go]": {
+      "editor.snippetSuggestions": "inline",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+      }
+    },
+    "go.testEnvFile": "${workspaceFolder}/deployments/.base.env",
+    "go.testEnvVars": {
+      "CONFIG_FILE": "${workspaceFolder}/configs/app.yaml"
+    }
+  }
+  

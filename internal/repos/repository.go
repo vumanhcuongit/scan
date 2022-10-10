@@ -80,7 +80,7 @@ func (r *RepositorySQLRepo) buildQueryFromFilter(
 	}
 
 	if filter.RepositoryID != nil {
-		query = query.Where("repository_id = ?", filter.RepositoryID)
+		query = query.Where("id = ?", filter.RepositoryID)
 	}
 
 	return query

@@ -26,6 +26,20 @@ type Scan struct {
 	UpdatedAt      time.Time  `json:"updated_at"`
 }
 
+type ScanRequestMessage struct {
+	ScanID     int64  `json:"scan_id"`
+	Owner      string `json:"owner"`
+	Repository string `json:"repository"`
+}
+
+type ScanResultMessage struct {
+	ScanID     int64      `json:"scan_id"`
+	ScanStatus string     `json:"scan_status"`
+	Findings   string     `json:"findings"`
+	ScanningAt *time.Time `json:"scanning_at,omitempty"`
+	FinishedAt *time.Time `json:"finished_at,omitempty"`
+}
+
 type ScanFilter struct {
 	RepositoryID   *int64
 	RepositoryName *string

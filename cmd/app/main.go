@@ -63,5 +63,12 @@ func startApp(cfg *config.App) {
 			panic(err)
 		}
 	}()
+
+	go func() {
+		err := s.Start()
+		if err != nil {
+			panic(err)
+		}
+	}()
 	infra.WaitOSSignal()
 }

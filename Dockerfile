@@ -6,8 +6,6 @@ ARG GO111MODULE=on
 ARG GOARCH=amd64
 ARG GOOS=linux
 
-RUN apk add --update --no-cache ca-certificates curl git tzdata
-RUN ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 
 WORKDIR /repo
 
@@ -18,22 +16,15 @@ RUN go mod download
 COPY . .
 RUN export VERSION=$(git rev-parse --short HEAD)
 RUN go build -o /repo/app cmd/app/main.go
-RUN go build -o /repo/worker cmd/worker/main.go
+RUN go build -o /repo/execution cmd/execution/main.go
 
 # Deploy
 FROM alpine:3.13 as deployer
 
-RUN apk add --update --no-cache ca-certificates curl git tzdata
-RUN ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
-
-RUN GRPC_HEALTH_PROBE_VERSION=v0.3.4 && \
-    wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /bin/grpc_health_probe
-
 WORKDIR /repo
 
 COPY --from=builder /repo/app /repo/app
-COPY --from=builder /repo/worker /repo/worker
+COPY --from=builder /repo/execution /repo/execution
 
 COPY scripts /repo/scripts
 COPY configs /repo/configs
