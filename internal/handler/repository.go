@@ -5,13 +5,13 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/vumanhcuongit/scan/internal/services/api"
+	"go.uber.org/zap"
 )
 
 func (h *Handler) createRepository(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	var req = &api.CreateRepositoryRequest{}
 	if err := ginCtx.ShouldBindJSON(req); err != nil {
 		log.Warnf("failed to parse request, error: %v", err.Error())
@@ -29,7 +29,7 @@ func (h *Handler) createRepository(ginCtx *gin.Context) {
 
 func (h *Handler) getRepository(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	repositoryIDStr := ginCtx.Param("id")
 	if repositoryIDStr == "" {
 		log.Warnf("missing repository id")
@@ -55,8 +55,7 @@ func (h *Handler) getRepository(ginCtx *gin.Context) {
 
 func (h *Handler) listRepositories(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
-
+	log := zap.S()
 	var req = &api.ListRepositoriesRequest{}
 	if err := ginCtx.ShouldBindQuery(req); err != nil {
 		log.Warnf("failed to parse request, error: %v", err.Error())
@@ -78,7 +77,7 @@ func (h *Handler) listRepositories(ginCtx *gin.Context) {
 
 func (h *Handler) updateRepository(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 
 	repositoryIDStr := ginCtx.Param("id")
 	if repositoryIDStr == "" {
@@ -111,7 +110,7 @@ func (h *Handler) updateRepository(ginCtx *gin.Context) {
 
 func (h *Handler) deleteRepository(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	repositoryIDStr := ginCtx.Param("id")
 	if repositoryIDStr == "" {
 		log.Warnf("missing repository id")

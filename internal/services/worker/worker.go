@@ -13,6 +13,7 @@ type Worker struct {
 }
 
 type ScanRequest struct {
+	ScanID     int64  `json:"scan_id"`
 	Owner      string `json:"owner"`
 	Repository string `json:"repository"`
 }

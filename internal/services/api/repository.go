@@ -3,8 +3,8 @@ package api
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	"github.com/vumanhcuongit/scan/pkg/models"
+	"go.uber.org/zap"
 )
 
 type CreateRepositoryRequest struct {
@@ -24,7 +24,7 @@ type ListRepositoriesRequest struct {
 }
 
 func (s *ScanService) CreateRepository(ctx context.Context, request *CreateRepositoryRequest) (*models.Repository, error) {
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	log.Infof("starting to create a repository with request %+v", request)
 
 	record, err := models.NewRepository(request.RepositoryURL)
@@ -43,7 +43,7 @@ func (s *ScanService) CreateRepository(ctx context.Context, request *CreateRepos
 }
 
 func (s *ScanService) GetRepository(ctx context.Context, repositoryID int64) (*models.Repository, error) {
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	log.Infof("starting to get repository with id %d", repositoryID)
 
 	repository, err := s.repo.Repository().GetByID(ctx, repositoryID)
@@ -56,7 +56,7 @@ func (s *ScanService) GetRepository(ctx context.Context, repositoryID int64) (*m
 }
 
 func (s *ScanService) ListRepositories(ctx context.Context, request *ListRepositoriesRequest) ([]*models.Repository, error) {
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	log.Infof("starting to list repositories with request %+v", request)
 
 	filter := &models.RepositoryFilter{}
@@ -73,7 +73,7 @@ func (s *ScanService) ListRepositories(ctx context.Context, request *ListReposit
 }
 
 func (s *ScanService) UpdateRepository(ctx context.Context, repositoryID int64, request *UpdateRepositoryRequest) (*models.Repository, error) {
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	log.Infof("starting to update repository with request %+v", request)
 
 	repository, err := s.repo.Repository().GetByID(ctx, repositoryID)
@@ -106,7 +106,7 @@ func (s *ScanService) UpdateRepository(ctx context.Context, repositoryID int64, 
 }
 
 func (s *ScanService) DeleteRepository(ctx context.Context, repositoryID int64) error {
-	log := ctxzap.Extract(ctx).Sugar()
+	log := zap.S()
 	log.Infof("starting to delete repository with id %d", repositoryID)
 
 	repository, err := s.repo.Repository().GetByID(ctx, repositoryID)

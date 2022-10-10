@@ -1,27 +1,63 @@
 openapi: 3.0.0
 info:
-  title: Scan
+  title: Scanning Service
   version: 1.0.0
 servers:
   - url: http://localhost:8000
 paths:
-  /api/scans/1:
+  /api/scans:
     post:
       tags:
         - General
       summary: Create Scan
+      description: create a new scan for a repository's id
       requestBody:
-        content: {}
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                repository_id: 3
       responses:
         '200':
-          description: Successful response
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Mon, 10 Oct 2022 01:16:17 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '322'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  id: 1
+                  repository_id: 3
+                  repository_name: bitflyer-rb
+                  repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+                  findings: ''
+                  status: Queued
+                  queued_at: '2022-10-10T08:16:17.315762679+07:00'
+                  scanning_at: null
+                  created_at: '2022-10-10T08:16:16.232+07:00'
+                  updated_at: '2022-10-10T08:16:17.321+07:00'
   /api/repositories:
     post:
       tags:
         - General
       summary: Create Repository
+      description: >-
+        create a repository based on the repository's URL sent in the request's
+        body
       requestBody:
         content:
           application/json:
@@ -61,6 +97,7 @@ paths:
       tags:
         - General
       summary: List Repositories
+      description: get the list of repositories
       parameters:
         - name: page
           in: query
@@ -105,6 +142,7 @@ paths:
       tags:
         - General
       summary: Update Repository
+      description: Patch an repository
       requestBody:
         content:
           application/json:
@@ -146,6 +184,7 @@ paths:
       tags:
         - General
       summary: Delete Repository
+      description: delete a respository given it's id
       responses:
         '204':
           description: No Content
@@ -164,6 +203,7 @@ paths:
       tags:
         - General
       summary: Get Repository
+      description: get the repository by the repository id
       responses:
         '200':
           description: OK
@@ -199,6 +239,23 @@ paths:
       summary: Ping
       responses:
         '200':
-          description: Successful response
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 23:46:01 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '69'
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+              example:
+                time_now: 2022-10-10 06:46:01.636646547 +0700 +07 m=+4.253845419
