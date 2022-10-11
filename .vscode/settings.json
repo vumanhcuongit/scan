@@ -2,7 +2,7 @@
     "go.useLanguageServer": true,
     "go.formatTool": "goimports",
     "go.languageServerExperimentalFeatures": {
-      "autoComplete": false,
+      "autoComplete": true,
       "diagnostics": true // for diagnostics as you type
     },
     "go.alternateTools": {

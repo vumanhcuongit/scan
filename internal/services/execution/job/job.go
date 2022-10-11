@@ -18,13 +18,13 @@ const (
 )
 
 type Job struct {
-	gitScan     *gitscan.GitScan
-	kafkaWriter *kafka.Writer
+	gitScan     gitscan.IGitScan
+	kafkaWriter kafka.IWriter
 }
 
-func NewJob(sourcesCodeDir string, kafkaWriter *kafka.Writer) *Job {
+func NewJob(gitScan gitscan.IGitScan, kafkaWriter kafka.IWriter) *Job {
 	return &Job{
-		gitScan:     gitscan.NewGitScan(sourcesCodeDir),
+		gitScan:     gitScan,
 		kafkaWriter: kafkaWriter,
 	}
 }
@@ -53,7 +53,6 @@ func (j *Job) HandleScanSourceCodeJob(ctx context.Context, t *asynq.Task) error 
 	if err := json.Unmarshal(t.Payload(), &payload); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
-	fmt.Println("starting to scan source code with payload")
 	log.Infof("starting to scan source code with payload %+v", payload)
 
 	err := j.produceInProgressResultMessage(ctx, &payload)
@@ -64,16 +63,14 @@ func (j *Job) HandleScanSourceCodeJob(ctx context.Context, t *asynq.Task) error 
 
 	findings, err := j.gitScan.Scan(ctx, payload.OwnerName, payload.RepoName)
 	if err != nil {
-		err := j.produceFailedResultMessage(ctx, &payload)
-		if err != nil {
-			log.Infof("failed to produce in progress message, err: +%v", err)
+		produceMessageErr := j.produceFailedResultMessage(ctx, &payload)
+		if produceMessageErr != nil {
+			log.Infof("failed to produce in progress message, err: +%v", produceMessageErr)
 		}
-		return err
 	} else {
-		err := j.produceSuccessfulResultMessage(ctx, &payload, findings)
-		if err != nil {
-			log.Infof("failed to produce succesful message, err: +%v", err)
-			return err
+		produceMessageErr := j.produceSuccessfulResultMessage(ctx, &payload, findings)
+		if produceMessageErr != nil {
+			log.Infof("failed to produce succesful message, err: +%v", produceMessageErr)
 		}
 	}
 

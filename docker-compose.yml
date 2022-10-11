@@ -36,9 +36,9 @@ services:
             - '9092:9092'
             - '8082:8082'
             - '8083:8083'
-    scanning:
+    scan:
         build: .
-        container_name: scanning
+        container_name: scan
         depends_on:
             - database
             - broker

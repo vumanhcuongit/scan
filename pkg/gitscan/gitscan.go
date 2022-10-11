@@ -20,6 +20,8 @@ import (
 	"go.uber.org/zap"
 )
 
+//go:generate mockgen -source=gitscan.go -destination=igitscan.mock.go -package=gitscan
+
 const (
 	ruleID                    = "G101"
 	typeSast                  = "sast"
@@ -29,13 +31,21 @@ const (
 	secretPublicKey           = "public_key"
 )
 
+type IGitScan interface {
+	Scan(
+		ctx context.Context,
+		ownerName string,
+		repoName string,
+	) ([]models.Finding, error)
+}
+
 type GitScan struct {
 	sourceCodesDir string // directory contains repository's code
 	githubClient   *github.Client
 	httpClient     *http.Client
 }
 
-func NewGitScan(sourcesCodeDir string) *GitScan {
+func NewGitScan(sourcesCodeDir string) IGitScan {
 	httpClient := &http.Client{Timeout: 2 * time.Minute}
 	githubClient := github.NewClient(httpClient)
 	return &GitScan{

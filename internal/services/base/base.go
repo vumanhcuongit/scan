@@ -30,6 +30,10 @@ func (s *Service) SetRepo(repo repos.IRepo) {
 	s.repo = repo
 }
 
+func (s *Service) SetConfig(cfg *config.App) {
+	s.cfg = cfg
+}
+
 func (s *Service) Repo() repos.IRepo {
 	return s.repo
 }

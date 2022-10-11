@@ -7,10 +7,8 @@ import (
 )
 
 //go:generate mockgen -source=irepo.go -destination=irepo.mock.go -package=repos
-
 type IRepo interface {
 	Stop()
-	CleanDB()
 	WithTransaction(ctx context.Context, fn func(IRepo) error) (err error)
 	Repository() IRepositoryRepo
 	Scan() IScanRepo

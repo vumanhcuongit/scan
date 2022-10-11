@@ -17,10 +17,10 @@ type ScanService struct {
 	base.Service
 	scanChecker *ScanChecker
 	kafkaReader *kafka.Reader
-	kafkaWriter *kafka.Writer
+	kafkaWriter kafka.IWriter
 }
 
-func NewScanService(bs *base.Service, kafkaWriter *kafka.Writer, kafkaReader *kafka.Reader) *ScanService {
+func NewScanService(bs *base.Service, kafkaWriter kafka.IWriter, kafkaReader *kafka.Reader) *ScanService {
 	scanChecker := NewScanChecker(bs.Repo(), &bs.Config().ScanChecker)
 	return &ScanService{
 		Service:     *bs,

@@ -21,7 +21,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func NewServer(cfg *config.App, kafkaWriter *kafka.Writer, kafkaReader *kafka.Reader) *Server {
+func NewServer(cfg *config.App, kafkaWriter kafka.IWriter, kafkaReader *kafka.Reader) *Server {
 	logger, _ := zap.NewProduction()
 	defer func() {
 		_ = logger.Sync()

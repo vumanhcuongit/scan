@@ -36,9 +36,7 @@ func TestMain(m *testing.M) {
 		repo: repo,
 	}
 
-	repo.CleanDB()
 	exitVal := m.Run()
-	repo.CleanDB()
 	repo.Stop()
 	os.Exit(exitVal)
 }

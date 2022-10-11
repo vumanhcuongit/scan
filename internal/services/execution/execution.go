@@ -7,6 +7,7 @@ import (
 	"github.com/hibiken/asynq"
 	"github.com/vumanhcuongit/scan/internal/config"
 	"github.com/vumanhcuongit/scan/internal/services/execution/job"
+	"github.com/vumanhcuongit/scan/pkg/gitscan"
 	"github.com/vumanhcuongit/scan/pkg/kafka"
 	"github.com/vumanhcuongit/scan/pkg/models"
 	"go.uber.org/zap"
@@ -14,15 +15,16 @@ import (
 
 type Execution struct {
 	kafkaReader  *kafka.Reader
-	kafkaWriter  *kafka.Writer
+	kafkaWriter  kafka.IWriter
 	jobManager   *job.Job      // job are processed concurrently by multiple workers
 	workerClient *asynq.Client // client puts tasks on a queue
 	workerServer *asynq.Server // server pulls tasks off queues and starts a worker goroutine for each task
 	workerMux    *asynq.ServeMux
 }
 
-func New(cfg *config.App, kafkaReader *kafka.Reader, kafkaWriter *kafka.Writer) *Execution {
-	jobManager := job.NewJob(cfg.SourceCodesDir, kafkaWriter)
+func New(cfg *config.App, kafkaReader *kafka.Reader, kafkaWriter kafka.IWriter) *Execution {
+	gitScan := gitscan.NewGitScan(cfg.SourceCodesDir)
+	jobManager := job.NewJob(gitScan, kafkaWriter)
 	workerServer, workerMux, workerClient, err := SetupWorker(&cfg.RedisWorker, jobManager)
 	if err != nil {
 		panic(err)
