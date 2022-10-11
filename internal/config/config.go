@@ -13,6 +13,7 @@ type App struct {
 	DB             *DatabaseConfig    `yaml:"db"`
 	MessageQueue   MessageQueueConfig `yaml:"message_queue"`
 	RedisWorker    RedisWorkerConfig  `yaml:"redis_worker"`
+	ScanChecker    ScanCheckerConfig  `yaml:"scan_checker"`
 	HTTPAddr       string             `yaml:"http_addr"`
 	SourceCodesDir string             `yaml:"source_codes_dir"`
 }
@@ -44,6 +45,11 @@ type DatabaseConfig struct {
 type RedisWorkerConfig struct {
 	RedisURL                string `yaml:"redis_url"`
 	TotalConcurrencyWorkers int    `yaml:"total_concurrency_workers"`
+}
+
+type ScanCheckerConfig struct {
+	MaxStaleTimeInMinutes int `yaml:"max_stale_time_in_minutes"`
+	IntervalInMinutes     int `yaml:"interval_in_minutes"`
 }
 
 // Load load config from file and environment variables.

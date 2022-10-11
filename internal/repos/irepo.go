@@ -48,4 +48,5 @@ type IScanRepo interface {
 		page int,
 		filter *models.ScanFilter,
 	) ([]*models.Scan, error)
+	MarkStaleScansAsFailure(ctx context.Context, maxMinutes int) error
 }

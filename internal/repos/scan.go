@@ -2,6 +2,7 @@ package repos
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -51,6 +52,19 @@ func (r *ScanSQLRepo) UpdateWithMap(
 
 func (r *ScanSQLRepo) Delete(ctx context.Context, record *models.Scan) error {
 	return r.dbWithContext(ctx).Delete(record).Error
+}
+
+func (r *ScanSQLRepo) MarkStaleScansAsFailure(
+	ctx context.Context,
+	maxMinutes int,
+) error {
+	timeNow := time.Now()
+	staleTime := timeNow.Add(-1 * time.Minute * time.Duration(maxMinutes))
+	return r.dbWithContext(ctx).
+		Model(models.Scan{}).
+		Where("status IN (?) AND (queued_at < ? OR scanning_at < ?)",
+			[]string{models.ScanStatusQueued, models.ScanStatusInProgress}, staleTime, staleTime).
+		Updates(models.Scan{Status: models.ScanStatusFailure, FinishedAt: &timeNow}).Error
 }
 
 func (r *ScanSQLRepo) List(

@@ -26,3 +26,7 @@ message_queue:
 redis_worker:
   redis_url: ${REDIS_URL}
   total_concurrency_workers: ${TOTAL_CONCURRENCY_WORKERS}
+
+scan_checker:
+  max_stale_time_in_minutes: ${SCAN_CHECKER_MAX_STALE_TIME_IN_MINUTES}
+  interval_in_minutes: ${SCAN_CHECKER_INTERVAL_IN_MINUTES}

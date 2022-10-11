@@ -7,6 +7,8 @@ services:
         environment:
             - MYSQL_ROOT_PASSWORD=change_me
             - MYSQL_DATABASE=scan      
+        ports:
+            - '3309:3306'
         healthcheck:
             test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
             timeout: 30s

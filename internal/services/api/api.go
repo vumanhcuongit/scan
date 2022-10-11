@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/vumanhcuongit/scan/internal/repos"
 	"github.com/vumanhcuongit/scan/internal/services/base"
@@ -14,20 +15,29 @@ import (
 type ScanService struct {
 	repo repos.IRepo
 	base.Service
+	scanChecker *ScanChecker
 	kafkaReader *kafka.Reader
 	kafkaWriter *kafka.Writer
 }
 
 func NewScanService(bs *base.Service, kafkaWriter *kafka.Writer, kafkaReader *kafka.Reader) *ScanService {
+	scanChecker := NewScanChecker(bs.Repo(), &bs.Config().ScanChecker)
 	return &ScanService{
 		Service:     *bs,
 		repo:        bs.Repo(),
+		scanChecker: scanChecker,
 		kafkaWriter: kafkaWriter,
 		kafkaReader: kafkaReader,
 	}
 }
 
 func (s *ScanService) Start(ctx context.Context) error {
+	ticker := time.NewTicker(time.Duration(s.Config().ScanChecker.IntervalInMinutes) * time.Minute)
+	go func() {
+		for range ticker.C {
+			_ = s.scanChecker.Check(ctx)
+		}
+	}()
 	return s.startConsumer(ctx)
 }
 
