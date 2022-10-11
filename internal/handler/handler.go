@@ -36,6 +36,7 @@ func (h *Handler) Register(router gin.IRouter) {
 
 	// scans
 	apiGroup.POST("/scans", h.createScan)
+	apiGroup.GET("/scans", h.listScans)
 }
 
 func (h *Handler) ReturnData(ginCtx *gin.Context, data interface{}) {

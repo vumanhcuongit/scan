@@ -30,18 +30,18 @@ const (
 )
 
 type GitScan struct {
-	sourceCodeDir string
-	githubClient  *github.Client
-	httpClient    *http.Client
+	sourceCodesDir string // directory contains repository's code
+	githubClient   *github.Client
+	httpClient     *http.Client
 }
 
-func NewGitScan(sourceCodeDir string) *GitScan {
+func NewGitScan(sourcesCodeDir string) *GitScan {
 	httpClient := &http.Client{Timeout: 2 * time.Minute}
 	githubClient := github.NewClient(httpClient)
 	return &GitScan{
-		sourceCodeDir: sourceCodeDir,
-		githubClient:  githubClient,
-		httpClient:    httpClient,
+		sourceCodesDir: sourcesCodeDir,
+		githubClient:   githubClient,
+		httpClient:     httpClient,
 	}
 }
 
@@ -49,7 +49,7 @@ func (g *GitScan) Scan(
 	ctx context.Context,
 	ownerName string,
 	repoName string,
-) (*models.FindingReport, error) {
+) ([]models.Finding, error) {
 	log := zap.S()
 	log.Infof("starting to scan repository, owner name %s, repo name %s", ownerName, repoName)
 
@@ -62,14 +62,14 @@ func (g *GitScan) Scan(
 		return nil, err
 	}
 
-	err = g.downloadAndUntar(ctx, url.String(), g.sourceCodeDir)
+	err = g.downloadAndUntar(ctx, url.String(), g.sourceCodesDir)
 	if err != nil {
 		log.Warnf("failed to download tarball, err: %+v", err)
 		return nil, err
 	}
 
 	repoFolderName := ""
-	err = filepath.Walk(g.sourceCodeDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(g.sourceCodesDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -94,7 +94,7 @@ func (g *GitScan) Scan(
 		return nil, errors.New("empty repo directory")
 	}
 
-	repoDir := path.Join(g.sourceCodeDir, repoFolderName)
+	repoDir := path.Join(g.sourceCodesDir, repoFolderName)
 	defer os.RemoveAll(repoDir)
 	findings := []models.Finding{}
 	err = filepath.Walk(repoDir, func(path string, info os.FileInfo, err error) error {
@@ -155,7 +155,7 @@ func (g *GitScan) Scan(
 		return nil, err
 	}
 
-	return &models.FindingReport{Findings: findings}, nil
+	return findings, nil
 }
 
 func (g *GitScan) downloadAndUntar(ctx context.Context, downloadURL string, destPath string) error {

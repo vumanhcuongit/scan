@@ -22,9 +22,9 @@ type Job struct {
 	kafkaWriter *kafka.Writer
 }
 
-func NewJob(sourceCodeDir string, kafkaWriter *kafka.Writer) *Job {
+func NewJob(sourcesCodeDir string, kafkaWriter *kafka.Writer) *Job {
 	return &Job{
-		gitScan:     gitscan.NewGitScan(sourceCodeDir),
+		gitScan:     gitscan.NewGitScan(sourcesCodeDir),
 		kafkaWriter: kafkaWriter,
 	}
 }
@@ -35,8 +35,12 @@ type ScanSourceCodePayload struct {
 	RepoName  string
 }
 
-func (j *Job) NewScanSourceCodeJob(ownerName string, repoName string) (*asynq.Task, error) {
-	payload, err := json.Marshal(ScanSourceCodePayload{OwnerName: ownerName, RepoName: repoName})
+func (j *Job) NewScanSourceCodeJob(scanID int64, ownerName string, repoName string) (*asynq.Task, error) {
+	payload, err := json.Marshal(ScanSourceCodePayload{
+		ScanID:    scanID,
+		OwnerName: ownerName,
+		RepoName:  repoName,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +62,7 @@ func (j *Job) HandleScanSourceCodeJob(ctx context.Context, t *asynq.Task) error 
 		return err
 	}
 
-	findingReport, err := j.gitScan.Scan(ctx, payload.OwnerName, payload.RepoName)
+	findings, err := j.gitScan.Scan(ctx, payload.OwnerName, payload.RepoName)
 	if err != nil {
 		err := j.produceFailedResultMessage(ctx, &payload)
 		if err != nil {
@@ -66,9 +70,9 @@ func (j *Job) HandleScanSourceCodeJob(ctx context.Context, t *asynq.Task) error 
 		}
 		return err
 	} else {
-		err := j.produceSuccessfulResultMessage(ctx, &payload, findingReport)
+		err := j.produceSuccessfulResultMessage(ctx, &payload, findings)
 		if err != nil {
-			log.Infof("failed to produce in succesful message, err: +%v", err)
+			log.Infof("failed to produce succesful message, err: +%v", err)
 			return err
 		}
 	}
@@ -101,14 +105,14 @@ func (j *Job) produceInProgressResultMessage(ctx context.Context, payload *ScanS
 func (j *Job) produceSuccessfulResultMessage(
 	ctx context.Context,
 	payload *ScanSourceCodePayload,
-	findingReport *models.FindingReport,
+	findings []models.Finding,
 ) error {
 	log := zap.S()
 
 	var findingRepoJSON []byte
 	var marshalErr error
-	if len(findingReport.Findings) > 0 {
-		findingRepoJSON, marshalErr = json.Marshal(findingReport)
+	if len(findings) > 0 {
+		findingRepoJSON, marshalErr = json.Marshal(findings)
 		if marshalErr != nil {
 			log.Warnf("failed to marshal finding report, err: %+v", marshalErr)
 			return marshalErr
@@ -120,7 +124,7 @@ func (j *Job) produceSuccessfulResultMessage(
 		ScanID:     payload.ScanID,
 		ScanStatus: models.ScanStatusSuccess,
 		FinishedAt: &timeNow,
-		Findings:   string(findingRepoJSON),
+		Findings:   findingRepoJSON,
 	})
 	if err != nil {
 		log.Warnf("failed to marshal message, err: %+v", err)

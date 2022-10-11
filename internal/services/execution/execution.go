@@ -4,21 +4,43 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/hibiken/asynq"
+	"github.com/vumanhcuongit/scan/internal/config"
+	"github.com/vumanhcuongit/scan/internal/services/execution/job"
 	"github.com/vumanhcuongit/scan/pkg/kafka"
 	"github.com/vumanhcuongit/scan/pkg/models"
 	"go.uber.org/zap"
 )
 
 type Execution struct {
-	kafkaReader *kafka.Reader
-	kafkaWriter *kafka.Writer
+	kafkaReader  *kafka.Reader
+	kafkaWriter  *kafka.Writer
+	jobManager   *job.Job      // job are processed concurrently by multiple workers
+	workerClient *asynq.Client // client puts tasks on a queue
+	workerServer *asynq.Server // server pulls tasks off queues and starts a worker goroutine for each task
+	workerMux    *asynq.ServeMux
 }
 
-func New(kafkaReader *kafka.Reader, kafkaWriter *kafka.Writer) *Execution {
-	return &Execution{
-		kafkaReader: kafkaReader,
-		kafkaWriter: kafkaWriter,
+func New(cfg *config.App, kafkaReader *kafka.Reader, kafkaWriter *kafka.Writer) *Execution {
+	jobManager := job.NewJob(cfg.SourceCodesDir, kafkaWriter)
+	workerServer, workerMux, workerClient, err := SetupWorker(&cfg.RedisWorker, jobManager)
+	if err != nil {
+		panic(err)
 	}
+
+	return &Execution{
+		kafkaReader:  kafkaReader,
+		kafkaWriter:  kafkaWriter,
+		jobManager:   jobManager,
+		workerServer: workerServer,
+		workerMux:    workerMux,
+		workerClient: workerClient,
+	}
+}
+
+func (e *Execution) Stop() {
+	e.workerClient.Close()
+	e.workerServer.Shutdown()
 }
 
 func (e *Execution) Run(ctx context.Context) error {
@@ -32,10 +54,21 @@ func (e *Execution) Run(ctx context.Context) error {
 		var req models.ScanRequestMessage
 		err := json.Unmarshal(message, &req)
 		if err != nil {
-			log.Errorf("failed to unmarshal message, err: %+v", err)
+			log.Warnf("failed to unmarshal message, err: %+v", err)
 			return err
 		}
-		log.Infof("req is: %+v", req)
+
+		scanSourceCodejob, err := e.jobManager.NewScanSourceCodeJob(req.ScanID, req.Owner, req.Repository)
+		if err != nil {
+			log.Warnf("failed to create job: %v", err)
+			return err
+		}
+		jobInfo, err := e.workerClient.Enqueue(scanSourceCodejob)
+		if err != nil {
+			log.Warnf("failed to enqueue job: %v", err)
+			return err
+		}
+		log.Infof("enqueued job: id=%s queue=%s", jobInfo.ID, jobInfo.Queue)
 
 		return nil
 	})

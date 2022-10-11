@@ -22,10 +22,10 @@ func NewReader(brokers string, topic string, groupId string) *Reader {
 	}
 }
 
-func (w *Reader) Consume(ctx context.Context, fn ReaderFunc) error {
+func (r *Reader) Consume(ctx context.Context, fn ReaderFunc) error {
 	log := ctxzap.Extract(ctx).Sugar()
 	for {
-		m, err := w.Reader.ReadMessage(ctx)
+		m, err := r.Reader.ReadMessage(ctx)
 		if err != nil {
 			log.Errorf("failed to consume message from Kafka, err: %+v", err)
 			return err

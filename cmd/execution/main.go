@@ -38,10 +38,10 @@ func main() {
 
 	infra.ConfigApplication(cfg.EnvConfig)
 
-	zap.S().Info(cfg.MessageQueue)
-	kafkaReader := kafka.NewReader(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicRequest, cfg.MessageQueue.GroupID)
+	kafkaReader := kafka.NewReader(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicRequest, cfg.MessageQueue.WorkerGroupID)
 	kafkaWriter := kafka.NewWriter(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicReply)
-	exec := execution.New(kafkaReader, kafkaWriter)
+	exec := execution.New(cfg, kafkaReader, kafkaWriter)
+	defer exec.Stop()
 	log.Printf("Starting execution service")
 	log.Fatal(exec.Run(context.Background()))
 }

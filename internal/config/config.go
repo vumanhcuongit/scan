@@ -9,11 +9,12 @@ import (
 )
 
 type App struct {
-	EnvConfig    *EnvConfig         `yaml:"common"`
-	DB           *DatabaseConfig    `yaml:"db"`
-	MessageQueue MessageQueueConfig `yaml:"message_queue"`
-	RedisWorker  RedisWorkerConfig  `yaml:"redis_worker"`
-	HTTPAddr     string             `yaml:"http_addr"`
+	EnvConfig      *EnvConfig         `yaml:"common"`
+	DB             *DatabaseConfig    `yaml:"db"`
+	MessageQueue   MessageQueueConfig `yaml:"message_queue"`
+	RedisWorker    RedisWorkerConfig  `yaml:"redis_worker"`
+	HTTPAddr       string             `yaml:"http_addr"`
+	SourceCodesDir string             `yaml:"source_codes_dir"`
 }
 
 type EnvConfig struct {
@@ -22,10 +23,11 @@ type EnvConfig struct {
 }
 
 type MessageQueueConfig struct {
-	Broker       string `yaml:"broker"`
-	TopicRequest string `yaml:"topic_request"`
-	TopicReply   string `yaml:"topic_reply"`
-	GroupID      string `yaml:"group_id"`
+	Broker          string `yaml:"broker"`
+	TopicRequest    string `yaml:"topic_request"`
+	TopicReply      string `yaml:"topic_reply"`
+	WorkerGroupID   string `yaml:"worker_group_id"`
+	ScanningGroupID string `yaml:"scanning_group_id"`
 }
 
 type DatabaseConfig struct {
@@ -41,7 +43,7 @@ type DatabaseConfig struct {
 
 type RedisWorkerConfig struct {
 	RedisURL                string `yaml:"redis_url"`
-	TotalConcurrencyWorkers uint   `yaml:"total_concurrency_workers"`
+	TotalConcurrencyWorkers int    `yaml:"total_concurrency_workers"`
 }
 
 // Load load config from file and environment variables.

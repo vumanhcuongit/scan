@@ -21,7 +21,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func NewServer(cfg *config.App, kafkaWriter *kafka.Writer) *Server {
+func NewServer(cfg *config.App, kafkaWriter *kafka.Writer, kafkaReader *kafka.Reader) *Server {
 	logger, _ := zap.NewProduction()
 	defer func() {
 		_ = logger.Sync()
@@ -34,7 +34,7 @@ func NewServer(cfg *config.App, kafkaWriter *kafka.Writer) *Server {
 	router := gin.New()
 	return &Server{
 		cfg:    cfg,
-		apiSvc: api.NewScanService(bs, kafkaWriter),
+		apiSvc: api.NewScanService(bs, kafkaWriter, kafkaReader),
 		router: router,
 	}
 }

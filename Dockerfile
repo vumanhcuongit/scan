@@ -10,7 +10,7 @@ ARG GOOS=linux
 WORKDIR /repo
 
 COPY go.mod go.sum ./
-RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+# RUN git config --global url."https://${GITHUB_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 RUN go mod download
 
 COPY . .
