@@ -13,7 +13,7 @@ CREATE TABLE scans (
     repository_id bigint,    
     repository_name varchar(255),
     repository_url varchar(255),
-    findings text,
+    findings json,
     status varchar(255),
     queued_at datetime,
     scanning_at datetime,

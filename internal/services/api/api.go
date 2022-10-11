@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/vumanhcuongit/scan/internal/repos"
 	"github.com/vumanhcuongit/scan/internal/services/base"
@@ -19,11 +18,12 @@ type ScanService struct {
 	kafkaWriter *kafka.Writer
 }
 
-func NewScanService(bs *base.Service, kafkaWriter *kafka.Writer) *ScanService {
+func NewScanService(bs *base.Service, kafkaWriter *kafka.Writer, kafkaReader *kafka.Reader) *ScanService {
 	return &ScanService{
 		Service:     *bs,
 		repo:        bs.Repo(),
 		kafkaWriter: kafkaWriter,
+		kafkaReader: kafkaReader,
 	}
 }
 
@@ -34,7 +34,6 @@ func (s *ScanService) Start(ctx context.Context) error {
 // startConsumers starts consumers consuming message from Scan Result topic
 func (s *ScanService) startConsumer(ctx context.Context) error {
 	log := zap.S()
-	fmt.Println("---------------------")
 	return s.kafkaReader.Consume(ctx, func(ctx context.Context, message []byte) error {
 		log.Infof("starting to consume result message: %s", message)
 		var result models.ScanResultMessage
@@ -43,8 +42,13 @@ func (s *ScanService) startConsumer(ctx context.Context) error {
 			log.Errorf("failed to unmarshal message, err: %+v", err)
 			return err
 		}
-		log.Infof("result is: %+v", result)
+		log.Infof("scan's result is: %+v", result)
 
+		err = s.handleResultMessage(ctx, &result)
+		if err != nil {
+			log.Errorf("failed to handle result's message, err: %+v", err)
+			return err
+		}
 		return nil
 	})
 }

@@ -66,13 +66,13 @@ func (h *Handler) listRepositories(ginCtx *gin.Context) {
 		req.Size = 20
 	}
 
-	repository, err := h.scanService.ListRepositories(ctx, req)
+	repositories, err := h.scanService.ListRepositories(ctx, req)
 	if err != nil {
 		h.ReturnError(ginCtx, err)
 		return
 	}
 
-	h.ReturnData(ginCtx, repository)
+	h.ReturnData(ginCtx, repositories)
 }
 
 func (h *Handler) updateRepository(ginCtx *gin.Context) {

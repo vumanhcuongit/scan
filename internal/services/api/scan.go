@@ -14,8 +14,34 @@ type TriggerScanRequest struct {
 }
 
 type UpdateScanRequest struct {
-	Status   string     `json:"status"`
-	QueuedAt *time.Time `json:"queued_at"`
+	Status     string     `json:"status"`
+	Findings   []byte     `json:"findings"`
+	QueuedAt   *time.Time `json:"queued_at"`
+	ScanningAt *time.Time `json:"scanning_at"`
+	FinishedAt *time.Time `json:"finished_at"`
+}
+
+type ListScansRequest struct {
+	RepositoryID *int64 `json:"repository_id" form:"repository_id"`
+	Size         int    `json:"size" form:"size"`
+	Page         int    `json:"page" form:"page"`
+}
+
+func (s *ScanService) ListScans(ctx context.Context, request *ListScansRequest) ([]*models.Scan, error) {
+	log := zap.S()
+	log.Infof("starting to list scans with request %+v", request)
+
+	filter := &models.ScanFilter{}
+	if request.RepositoryID != nil {
+		filter.RepositoryID = request.RepositoryID
+	}
+	scans, err := s.repo.Scan().List(ctx, request.Size, request.Page, filter)
+	if err != nil {
+		log.Warnf("failed to list scans, err: %+v", err)
+		return nil, err
+	}
+
+	return scans, nil
 }
 
 func (s *ScanService) TriggerScan(ctx context.Context, request *TriggerScanRequest) (*models.Scan, error) {
@@ -59,9 +85,21 @@ func (s *ScanService) UpdateScan(ctx context.Context, scan *models.Scan, request
 		changesets["status"] = request.Status
 		scan.Status = request.Status
 	}
+	if request.Findings != nil {
+		changesets["findings"] = request.Findings
+		scan.Findings = request.Findings
+	}
 	if request.QueuedAt != nil {
 		changesets["queued_at"] = request.QueuedAt
 		scan.QueuedAt = request.QueuedAt
+	}
+	if request.ScanningAt != nil {
+		changesets["scanning_at"] = request.ScanningAt
+		scan.ScanningAt = request.ScanningAt
+	}
+	if request.FinishedAt != nil {
+		changesets["finished_at"] = request.FinishedAt
+		scan.FinishedAt = request.FinishedAt
 	}
 
 	err := s.repo.Scan().UpdateWithMap(ctx, scan, changesets)
@@ -123,4 +161,31 @@ func (s *ScanService) updateQueuedScan(ctx context.Context, scan *models.Scan) (
 	}
 
 	return updatedScan, nil
+}
+
+// handleResultMessage handles result returned from workers
+func (s *ScanService) handleResultMessage(ctx context.Context, result *models.ScanResultMessage) error {
+	log := zap.S()
+	scan := &models.Scan{ID: result.ScanID}
+	updateScanRequest := &UpdateScanRequest{
+		Status: result.ScanStatus,
+	}
+	switch result.ScanStatus {
+	case models.ScanStatusInProgress:
+		updateScanRequest.ScanningAt = result.ScanningAt
+	case models.ScanStatusSuccess:
+		updateScanRequest.FinishedAt = result.FinishedAt
+		updateScanRequest.Findings = result.Findings
+	case models.ScanStatusFailure:
+		updateScanRequest.FinishedAt = result.FinishedAt
+	}
+
+	updatedScan, err := s.UpdateScan(ctx, scan, updateScanRequest)
+	if err != nil {
+		log.Warnf("failed to update scan, err: %+v", err)
+		return err
+	}
+	log.Infof("updated scan: %+v", updatedScan)
+
+	return nil
 }

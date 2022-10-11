@@ -8,16 +8,16 @@ paths:
   /api/scans:
     post:
       tags:
-        - General
+        - Scans
       summary: Create Scan
       description: create a new scan for a repository's id
-      requestBody:
+      requestBody:        
         content:
           application/json:
             schema:
               type: object
               example:
-                repository_id: 3
+                repository_id: 2
       responses:
         '200':
           description: OK
@@ -50,21 +50,106 @@ paths:
                   scanning_at: null
                   created_at: '2022-10-10T08:16:16.232+07:00'
                   updated_at: '2022-10-10T08:16:17.321+07:00'
+    get:
+      tags:
+        - Scans
+      summary: List Scans
+      description: get the list of scan result
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: size
+          in: query
+          schema:
+            type: integer
+          example: '20'
+        - name: repository_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Tue, 11 Oct 2022 01:25:09 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '919'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                data:
+                  - id: 1
+                    repository_id: 1
+                    repository_name: workshop
+                    repository_url: https://github.com/vumanhcuongit/workshop
+                    findings:
+                      - type: sast
+                        ruleId: G101
+                        location:
+                          path: be001/src/controllers/products.js
+                          positions:
+                            begin:
+                              line: 1
+                        metadata:
+                          severity: HIGH
+                          description: Potential hardcoded credentials
+                      - type: sast
+                        ruleId: G101
+                        location:
+                          path: be001/src/models/index.js
+                          positions:
+                            begin:
+                              line: 1
+                        metadata:
+                          severity: HIGH
+                          description: Potential hardcoded credentials
+                      - type: sast
+                        ruleId: G101
+                        location:
+                          path: be001/tests/setup.js
+                          positions:
+                            begin:
+                              line: 1
+                        metadata:
+                          severity: HIGH
+                          description: Potential hardcoded credentials
+                    status: Success
+                    queued_at: '2022-10-11T01:24:47Z'
+                    scanning_at: '2022-10-11T01:24:48Z'
+                    finished_at: '2022-10-11T01:24:50Z'
+                    created_at: '2022-10-11T01:24:46Z'
+                    updated_at: '2022-10-11T01:24:51Z'
   /api/repositories:
     post:
       tags:
-        - General
+        - Repositories
       summary: Create Repository
       description: >-
         create a repository based on the repository's URL sent in the request's
         body
       requestBody:
+        description: currently only supports repositories hosted on Github. repository_url must contain "https://". An example of a valid value is "https://github.com/vumanhcuongit/bitflyer-rb"
         content:
           application/json:
             schema:
               type: object
               example:
-                repository_url: https://github.com/vumanhcuongit/bitflyer-rb
+                repository_url: https://github.com/vumanhcuongit/workshop
       responses:
         '200':
           description: OK
@@ -109,6 +194,11 @@ paths:
           schema:
             type: integer
           example: '20'
+        - name: repository_id
+          in: query
+          schema:
+            type: integer
+          example: '1'
       responses:
         '200':
           description: OK
@@ -137,11 +227,15 @@ paths:
                     repository_url: https://github.com/vumanhcuongit/bitflyer-rb
                     created_at: '2022-10-09T14:43:28Z'
                     updated_at: '2022-10-09T14:43:28Z'
-  /api/repositories/1:
+  /api/repositories/{id}:
     patch:
       tags:
-        - General
+        - Repositories
       summary: Update Repository
+      parameters:
+        - in: path
+          name: id          
+          description: repository's id
       description: Patch an repository
       requestBody:
         content:
@@ -180,29 +274,14 @@ paths:
                   repository_url: https://github.com/vumanhcuongit/workshop1
                   created_at: '2022-10-09T14:34:07Z'
                   updated_at: '2022-10-09T21:46:46.522+07:00'
-    delete:
-      tags:
-        - General
-      summary: Delete Repository
-      description: delete a respository given it's id
-      responses:
-        '204':
-          description: No Content
-          headers:
-            Date:
-              schema:
-                type: string
-                example: Sun, 09 Oct 2022 14:47:02 GMT
-          content:
-            text/plain:
-              schema:
-                type: string
-              example: null
-  /api/repositories/3:
     get:
       tags:
-        - General
+        - Repositories
       summary: Get Repository
+      parameters:
+        - in: path
+          name: id          
+          description: repository's id
       description: get the repository by the repository id
       responses:
         '200':
@@ -232,6 +311,28 @@ paths:
                   repository_url: https://github.com/vumanhcuongit/bitflyer-rb
                   created_at: '2022-10-09T14:43:28Z'
                   updated_at: '2022-10-09T14:43:28Z'
+    delete:
+      tags:
+        - Repositories
+      summary: Delete Repository
+      parameters:
+        - in: path
+          name: id          
+          description: repository's id
+      description: delete a respository given it's id
+      responses:
+        '204':
+          description: No Content
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Sun, 09 Oct 2022 14:47:02 GMT
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: null
   /ping:
     get:
       tags:

@@ -20,7 +20,8 @@ message_queue:
   broker: ${MESSAGE_QUEUE_BROKER}
   topic_request: ${MESSAGE_QUEUE_TOPIC_REQUEST}
   topic_reply: ${MESSAGE_QUEUE_TOPIC_RESULT}
-  group_id: ${MESSAGE_QUEUE_GROUP_ID}
+  worker_group_id: ${MESSAGE_QUEUE_WORKER_GROUP_ID}
+  scanning_group_id: ${MESSAGE_QUEUE_SCANNING_GROUP_ID}
 
 redis_worker:
   redis_url: ${REDIS_URL}

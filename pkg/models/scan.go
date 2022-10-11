@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/datatypes"
 )
 
 const (
@@ -13,17 +15,17 @@ const (
 )
 
 type Scan struct {
-	ID             int64      `json:"id"`
-	RepositoryID   int64      `json:"repository_id"`
-	RepositoryName string     `json:"repository_name"`
-	RepositoryURL  string     `json:"repository_url"`
-	Findings       string     `json:"findings"`
-	Status         string     `json:"status"`
-	QueuedAt       *time.Time `json:"queued_at"`
-	ScanningAt     *time.Time `json:"scanning_at"`
-	FinishedAt     *time.Time `json:"finished_at"`
-	CreatedAt      time.Time  `json:"created_at"`
-	UpdatedAt      time.Time  `json:"updated_at"`
+	ID             int64          `json:"id"`
+	RepositoryID   int64          `json:"repository_id"`
+	RepositoryName string         `json:"repository_name"`
+	RepositoryURL  string         `json:"repository_url"`
+	Findings       datatypes.JSON `json:"findings"`
+	Status         string         `json:"status"`
+	QueuedAt       *time.Time     `json:"queued_at"`
+	ScanningAt     *time.Time     `json:"scanning_at"`
+	FinishedAt     *time.Time     `json:"finished_at"`
+	CreatedAt      time.Time      `json:"created_at"`
+	UpdatedAt      time.Time      `json:"updated_at"`
 }
 
 type ScanRequestMessage struct {
@@ -35,7 +37,7 @@ type ScanRequestMessage struct {
 type ScanResultMessage struct {
 	ScanID     int64      `json:"scan_id"`
 	ScanStatus string     `json:"scan_status"`
-	Findings   string     `json:"findings"`
+	Findings   []byte     `json:"findings"`
 	ScanningAt *time.Time `json:"scanning_at,omitempty"`
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
 }

@@ -56,7 +56,8 @@ func migrateDB(cfg *config.App) {
 
 func startApp(cfg *config.App) {
 	kafkaWriter := kafka.NewWriter(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicRequest)
-	s := internal.NewServer(cfg, kafkaWriter)
+	kafkaReader := kafka.NewReader(cfg.MessageQueue.Broker, cfg.MessageQueue.TopicReply, cfg.MessageQueue.ScanningGroupID)
+	s := internal.NewServer(cfg, kafkaWriter, kafkaReader)
 	go func() {
 		err := s.Listen()
 		if err != nil {

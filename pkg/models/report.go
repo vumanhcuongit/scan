@@ -1,9 +1,5 @@
 package models
 
-type FindingReport struct {
-	Findings []Finding `json:"findings"`
-}
-
 type Finding struct {
 	Type     string   `json:"type"`
 	RuleID   string   `json:"ruleId"`
