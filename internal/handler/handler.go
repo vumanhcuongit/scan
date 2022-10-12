@@ -10,10 +10,10 @@ import (
 )
 
 type Handler struct {
-	scanService *api.ScanService
+	scanService api.IScanService
 }
 
-func NewHandler(scanService *api.ScanService) *Handler {
+func NewHandler(scanService api.IScanService) *Handler {
 	return &Handler{
 		scanService: scanService,
 	}
@@ -37,6 +37,10 @@ func (h *Handler) Register(router gin.IRouter) {
 	// scans
 	apiGroup.POST("/scans", h.createScan)
 	apiGroup.GET("/scans", h.listScans)
+}
+
+func (h *Handler) SetScanService(scanService api.IScanService) {
+	h.scanService = scanService
 }
 
 func (h *Handler) ReturnData(ginCtx *gin.Context, data interface{}) {

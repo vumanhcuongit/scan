@@ -26,10 +26,6 @@ func NewService(cfg *config.App) *Service {
 	}
 }
 
-func (s *Service) SetRepo(repo repos.IRepo) {
-	s.repo = repo
-}
-
 func (s *Service) SetConfig(cfg *config.App) {
 	s.cfg = cfg
 }

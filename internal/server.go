@@ -15,7 +15,7 @@ import (
 )
 
 type Server struct {
-	apiSvc     *api.ScanService
+	apiSvc     api.IScanService
 	cfg        *config.App
 	router     *gin.Engine
 	httpServer *http.Server

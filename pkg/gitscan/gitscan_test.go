@@ -23,5 +23,6 @@ func TestScanSourceCode(t *testing.T) {
 	gitScanSrv := NewGitScan(sourceCodesDir)
 	findings, err := gitScanSrv.Scan(ctx, "vumanhcuongit", "workshop")
 	require.NoError(t, err)
-	require.Equal(t, 1, len(findings))
+	require.Equal(t, 3, len(findings))
+	os.RemoveAll(sourceCodesDir)
 }

@@ -163,8 +163,8 @@ func (s *ScanService) updateQueuedScan(ctx context.Context, scan *models.Scan) (
 	return updatedScan, nil
 }
 
-// handleResultMessage handles result returned from workers
-func (s *ScanService) handleResultMessage(ctx context.Context, result *models.ScanResultMessage) error {
+// HandleResultMessage handles result returned from workers
+func (s *ScanService) HandleResultMessage(ctx context.Context, result *models.ScanResultMessage) error {
 	log := zap.S()
 	scan := &models.Scan{ID: result.ScanID}
 	updateScanRequest := &UpdateScanRequest{
@@ -178,6 +178,9 @@ func (s *ScanService) handleResultMessage(ctx context.Context, result *models.Sc
 		updateScanRequest.Findings = result.Findings
 	case models.ScanStatusFailure:
 		updateScanRequest.FinishedAt = result.FinishedAt
+	default:
+		log.Warnf("unsupported status")
+		return nil
 	}
 
 	updatedScan, err := s.UpdateScan(ctx, scan, updateScanRequest)
