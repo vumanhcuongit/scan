@@ -180,7 +180,7 @@ paths:
                   updated_at: '2022-10-09T21:43:27.804+07:00'
     get:
       tags:
-        - General
+        - Repositories
       summary: List Repositories
       description: get the list of repositories
       parameters:
